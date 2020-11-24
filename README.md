@@ -1,7 +1,6 @@
 # Joint Distribution across Representation Spaces for Out-of-Distribution Detection
 
 This project is for the paper "Joint Distribution across Representation Spaces for Out-of-Distribution Detection". 
-Some codes are from [deep_Mahalanobis_detector](https://github.com/pokaxpoka/deep_Mahalanobis_detector), [odin-pytorch](https://github.com/facebookresearch/odin), [LID](https://github.com/xingjunm/lid_adversarial_subspace_detection), and [adversarial_image_defenses](https://github.com/facebookresearch/adversarial_image_defenses).
 
 ## Preliminaries
 It is tested under Ubuntu Linux 16.04 and Python 3.8 environment, and requries Pytorch package to be installed:
@@ -27,7 +26,7 @@ We use four pre-trained neural networks from [deep_Mahalanobis_detector](https:/
 
 They are placed to `./pre_trained/`.
 
-## Usage
+## How to use
 
 ```
 # model: ResNet, in-distribution: CIFAR-10, batch_size: 200
