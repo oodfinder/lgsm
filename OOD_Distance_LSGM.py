@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from scipy.special import logsumexp
 from sklearn import metrics
-from sklearn.mixture import BayesianGaussianMixture
+from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from torchvision import datasets, transforms
 
 import models
@@ -16,6 +16,7 @@ parser.add_argument('--batch_size', type=int, default=200, metavar='N', help='ba
 parser.add_argument('--dataset', default='cifar10', help='cifar10 | cifar100 | svhn')
 parser.add_argument('--dataroot', default='./data', help='path to dataset')
 parser.add_argument('--net_type', default='resnet', help='resnet | densenet')
+parser.add_argument('--method', default='gmm', help='gmm | dpgmm')
 parser.add_argument('--n_components', type=int, default=50, help='components # of Gaussian Mixture')
 parser.add_argument('--seed', type=int, default=123, help='random seed')
 args = parser.parse_args()
@@ -195,11 +196,14 @@ def main():
         x_train = train_features[i]
         x_test = test_features[i]
         # scaler = StandardScaler().fit(x_train) x_train = scaler.transform(x_train) x_test = scaler.transform(x_test)
-        # train kmeans gmm = GaussianMixture(n_components=component_list[i], covariance_type='diag', max_iter=1000,
-        # init_params='kmeans', reg_covar=1e-6, verbose=1, random_state=seed)
-        gmm = BayesianGaussianMixture(n_components=args.n_components, covariance_type='diag', max_iter=2000,
-                                      weight_concentration_prior_type='dirichlet_process',
-                                      weight_concentration_prior=0.1, reg_covar=1e-6, init_params='kmeans')
+        # train kmeans
+        if args.method == 'dpgmm':
+            gmm = BayesianGaussianMixture(n_components=args.n_components, covariance_type='diag', max_iter=2000,
+                                          weight_concentration_prior_type='dirichlet_process', random_state=args.seed,
+                                          weight_concentration_prior=0.1, reg_covar=1e-6, init_params='kmeans')
+        else:
+            gmm = GaussianMixture(n_components=args.n_components, covariance_type='diag', max_iter=1000,
+                                  init_params='kmeans', reg_covar=1e-6, random_state=args.seed)
         gmm.fit(x_train)
         gmm_list.append(gmm)
         #     gmm = gmm_list[i]
