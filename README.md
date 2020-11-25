@@ -32,3 +32,8 @@ They are placed to `./pre_trained/`.
 # model: ResNet, in-distribution: CIFAR-10, batch_size: 200
 python OOD_Distance_LSGM.py --dataset cifar10 --net_type resnet --batch_size 200
 ```
+
+# Experimental Result
+This followings are the experimental results, which is the same as in the paper.
+
+ ![image](./result.png)
