@@ -107,7 +107,7 @@ def main():
     with torch.no_grad():
         # extract training data
         for itr, (input, target) in enumerate(train_loader):
-            input, target = input.cuda(), target  # .cuda()
+            input, target = input.cuda(), target
             y, out_list = model.feature_list(input)
 
             # process the data
@@ -134,7 +134,7 @@ def main():
     model.eval()
     with torch.no_grad():
         for itr, (input, target) in enumerate(test_loader):
-            input, target = input.cuda(), target  # .cuda()
+            input, target = input.cuda(), target
             y, out_list = model.feature_list(input)
             for i, layer in enumerate(out_list):
                 assert layer.dim() == 4
@@ -146,7 +146,7 @@ def main():
                 print((itr + 1) * args.batch_size)
 
         for itr, (input, target) in enumerate(svhn_loader):
-            input, target = input.cuda(), target  # .cuda()
+            input, target = input.cuda(), target
             y, out_list = model.feature_list(input)
             for i, layer in enumerate(out_list):
                 layer = F.avg_pool2d(layer, pool_sizes[i])
@@ -158,7 +158,7 @@ def main():
                 break
 
         for itr, (input, target) in enumerate(imagenet_loader):
-            input, target = input.cuda(), target  # .cuda()
+            input, target = input.cuda(), target
             y, out_list = model.feature_list(input)
             for i, layer in enumerate(out_list):
                 layer = F.avg_pool2d(layer, pool_sizes[i])
@@ -169,7 +169,7 @@ def main():
                 print((itr + 1) * args.batch_size)
 
         for itr, (input, target) in enumerate(lsun_loader):
-            input, target = input.cuda(), target  # .cuda()
+            input, target = input.cuda(), target
             y, out_list = model.feature_list(input)
             for i, layer in enumerate(out_list):
                 layer = F.avg_pool2d(layer, pool_sizes[i])
@@ -187,7 +187,7 @@ def main():
     labels_train, labels_test = [], []
     probs_train, probs_test = [], []
     gmm_list = []
-    # for layers, train...
+    # for layers, train the model...
     for i, features in enumerate(train_features):
         print('layer', i, ':', features.shape)
         if i == n_layers:  # last layer
@@ -196,7 +196,6 @@ def main():
         x_train = train_features[i]
         x_test = test_features[i]
         # scaler = StandardScaler().fit(x_train) x_train = scaler.transform(x_train) x_test = scaler.transform(x_test)
-        # train kmeans
         if args.method == 'dpgmm':
             gmm = BayesianGaussianMixture(n_components=args.n_components, covariance_type='diag', max_iter=2000,
                                           weight_concentration_prior_type='dirichlet_process', random_state=args.seed,
@@ -217,7 +216,7 @@ def main():
         labels_train.append(x_train_labels)
         labels_test.append(x_test_labels)
 
-        # save the probilities
+        # save the probabilities
         x_train_probs = gmm.score_samples(x_test)
         x_test_probs = gmm._estimate_weighted_log_prob(x_test)
         probs_train.append(x_train_probs)
@@ -242,8 +241,6 @@ def main():
     path_train = np.vstack(labels_train).T
     path_test = np.vstack(labels_test).T
     y_test = np.concatenate((np.zeros(10000), np.ones(30000)))
-    # incorrect as ood
-    # y_test[:10000][~correct_test] = 1
 
     bigram = []
     for i in range(0, n_layers - 1):
@@ -260,9 +257,9 @@ def main():
         bigram.append(count)
 
     def lsgm_score(j):
-        m = probs_test[1][j].reshape(-1, 1) + probs_test[2][j].reshape(1, -1)  # 对应相加
+        m = probs_test[1][j].reshape(-1, 1) + probs_test[2][j].reshape(1, -1) 
         # m.shape == (k1, k2)
-        m += bigram[1]  # 乘转移概率
+        m += bigram[1]
 
         # layer 2->3
         for i in range(3, n_layers - 1):
